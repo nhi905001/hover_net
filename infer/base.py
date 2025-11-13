@@ -14,7 +14,7 @@ import numpy as np
 import torch
 import torch.utils.data as data
 import tqdm
-
+from misc.utils import log_info  # <<-- BỔ SUNG DÒNG NÀY
 from run_utils.utils import convert_pytorch_checkpoint
 
 
@@ -56,7 +56,7 @@ class InferManager(object):
     def __load_model(self):
         """Create the model, load the checkpoint and define
         associated run steps to process each data batch.
-        
+
         """
         model_desc = import_module("models.hovernet.net_desc")
         model_creator = getattr(model_desc, "create_model")
@@ -65,7 +65,15 @@ class InferManager(object):
         saved_state_dict = torch.load(self.method["model_path"])["desc"]
         saved_state_dict = convert_pytorch_checkpoint(saved_state_dict)
 
-        net.load_state_dict(saved_state_dict, strict=True)
+        net.load_state_dict(
+            saved_state_dict, strict=False
+        )  # <<-- SỬA: Cho phép bỏ qua trọng số thừa (decoder.tp)
+
+        # BỔ SUNG: In ra thông tin để debug (như run_train.py đã làm)
+        load_feedback = net.load_state_dict(saved_state_dict, strict=False)
+        log_info("Model Loading Feedback:")
+        log_info(f"Missing Keys (NORMAL): {load_feedback[0]}")
+        log_info(f"Unexpected Keys (TP branch): {load_feedback[1]}")
         net = torch.nn.DataParallel(net)
         net = net.to("cuda")
 

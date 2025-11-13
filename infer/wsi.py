@@ -50,7 +50,7 @@ def _init_worker_child(lock_):
 ####
 def _remove_inst(inst_map, remove_id_list):
     """Remove instances with id in remove_id_list.
-    
+
     Args:
         inst_map: map of instances
         remove_id_list: list of ids to remove from inst_map
@@ -96,7 +96,7 @@ def _get_tile_info(img_shape, tile_shape, ambiguous_size=128):
         img_shape: input image shape
         tile_shape: tile shape used for post processing
         ambiguous_size: used to define area at tile boundaries
-    
+
     """
     # * get normal tiling set
     tile_grid_top_left, _ = _get_patch_top_left_info(img_shape, tile_shape, tile_shape)
@@ -303,7 +303,7 @@ class InferManager(base.InferManager):
         Args:
             patch_info_list: patch input coordinate information
             has_output_info: whether output information is given
-        
+
         """
         down_sample_ratio = self.wsi_mask.shape[0] / self.wsi_proc_shape[0]
         selected_indices = []
@@ -332,7 +332,7 @@ class InferManager(base.InferManager):
         Args:
             chunk_info_list: list of inference tile coordinate information
             patch_info_list: list of patch coordinate information
-        
+
         """
         # 1 dedicated thread just to write results back to disk
         proc_pool = Pool(processes=1)
@@ -591,9 +591,9 @@ class InferManager(base.InferManager):
                 inst_info["centroid"] += top_left
                 self.wsi_inst_info[inst_id + wsi_max_id] = inst_info
             pred_inst[pred_inst > 0] += wsi_max_id
-            self.wsi_inst_map[
-                tile_tl[0] : tile_br[0], tile_tl[1] : tile_br[1]
-            ] = pred_inst
+            self.wsi_inst_map[tile_tl[0] : tile_br[0], tile_tl[1] : tile_br[1]] = (
+                pred_inst
+            )
 
             pbar.update()  # external
             return
@@ -637,9 +637,9 @@ class InferManager(base.InferManager):
                 roi_inner_inst_list, roi_boundary_inst_list, assume_unique=True
             )
             roi_inst = _remove_inst(roi_inst, roi_inner_inst_list)
-            self.wsi_inst_map[
-                tile_tl[0] : tile_br[0], tile_tl[1] : tile_br[1]
-            ] = roi_inst
+            self.wsi_inst_map[tile_tl[0] : tile_br[0], tile_tl[1] : tile_br[1]] = (
+                roi_inst
+            )
             for inst_id in roi_inner_inst_list:
                 self.wsi_inst_info.pop(inst_id, None)
 
@@ -669,9 +669,9 @@ class InferManager(base.InferManager):
                 self.wsi_inst_info[inst_id + wsi_max_id] = inst_info
             pred_inst[pred_inst > 0] += wsi_max_id
             pred_inst = roi_inst + pred_inst
-            self.wsi_inst_map[
-                tile_tl[0] : tile_br[0], tile_tl[1] : tile_br[1]
-            ] = pred_inst
+            self.wsi_inst_map[tile_tl[0] : tile_br[0], tile_tl[1] : tile_br[1]] = (
+                pred_inst
+            )
 
             pbar.update()  # external
             return
@@ -713,7 +713,7 @@ class InferManager(base.InferManager):
 
         Args:
             run_args: arguments as defined in run_infer.py
-        
+
         """
         self._parse_args(run_args)
 
